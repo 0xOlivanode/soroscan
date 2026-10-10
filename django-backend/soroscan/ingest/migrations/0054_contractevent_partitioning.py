@@ -25,6 +25,11 @@ def partition_contractevent(apps, schema_editor):
                 LIKE ingest_contractevent_old INCLUDING DEFAULTS INCLUDING CONSTRAINTS
             ) PARTITION BY RANGE ("timestamp");
 
+            -- Ensure sequence for id primary key
+            CREATE SEQUENCE IF NOT EXISTS ingest_contractevent_id_seq;
+            ALTER TABLE ingest_contractevent ALTER COLUMN id SET DEFAULT nextval('ingest_contractevent_id_seq');
+            ALTER SEQUENCE ingest_contractevent_id_seq OWNED BY ingest_contractevent.id;
+
             -- 3. Create initial active partitions and default partition
             CREATE TABLE ingest_contractevent_y2026m08 PARTITION OF ingest_contractevent
                 FOR VALUES FROM ('2026-08-01 00:00:00+00') TO ('2026-09-01 00:00:00+00');

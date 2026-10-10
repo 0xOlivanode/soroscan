@@ -135,7 +135,7 @@ describe("Navbar", () => {
 
   it("renders the logo text", () => {
     render(<Navbar />)
-    expect(screen.getByText("[SOROSCAN]")).toBeInTheDocument()
+    expect(screen.getByAltText("SoroScan Logo")).toBeInTheDocument()
   })
 
   it("renders desktop nav links", () => {

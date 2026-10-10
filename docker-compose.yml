@@ -35,6 +35,7 @@ services:
     build:
       context: ./django-backend
       dockerfile: Dockerfile
+      network: host
     container_name: soroscan-web
     command: >
       sh -c "python manage.py migrate --noinput &&
@@ -65,6 +66,7 @@ services:
     build:
       context: ./django-backend
       dockerfile: Dockerfile
+      network: host
     container_name: soroscan-worker-high
     command: celery -A soroscan worker --loglevel=info --concurrency=4 --queues=high_priority --soft-time-limit=30
     volumes:
@@ -87,6 +89,7 @@ services:
     build:
       context: ./django-backend
       dockerfile: Dockerfile
+      network: host
     container_name: soroscan-worker-default
     command: celery -A soroscan worker --loglevel=info --concurrency=2 --queues=default --soft-time-limit=30
     volumes:
@@ -109,6 +112,7 @@ services:
     build:
       context: ./django-backend
       dockerfile: Dockerfile
+      network: host
     container_name: soroscan-worker-low
     command: celery -A soroscan worker --loglevel=info --concurrency=2 --queues=low_priority --soft-time-limit=30
     volumes:
@@ -131,6 +135,7 @@ services:
     build:
       context: ./django-backend
       dockerfile: Dockerfile
+      network: host
     container_name: soroscan-worker-backfill
     command: celery -A soroscan worker --loglevel=info --concurrency=1 --queues=backfill --soft-time-limit=30
     volumes:
@@ -153,6 +158,7 @@ services:
     build:
       context: ./django-backend
       dockerfile: Dockerfile
+      network: host
     container_name: soroscan-beat
     command: celery -A soroscan beat --loglevel=info
     volumes:
@@ -194,6 +200,7 @@ services:
     build:
       context: .
       dockerfile: soroscan-frontend/Dockerfile.frontend
+      network: host
     container_name: soroscan-frontend
     command: sh -c "pnpm install && pnpm dev"
     volumes:

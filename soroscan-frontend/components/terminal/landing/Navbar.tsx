@@ -38,7 +38,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="border-b border-[#00e5ff]/20 px-6 md:px-8 py-4 flex flex-col bg-[#091a21]/90 backdrop-blur-md sticky top-0 z-50">
+    <nav className="border-b border-terminal-green/20 px-6 md:px-8 py-4 flex flex-col bg-terminal-black/95 backdrop-blur-md sticky top-0 z-50">
       <div className="flex justify-between items-center">
         {/* Logo */}
         <Link

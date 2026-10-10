@@ -1,7 +1,6 @@
 "use client";
 
 import React, { Suspense, useRef, useState } from 'react';
-import { useMutation, gql } from '@apollo/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { setTokens } from '@/lib/auth';
 import { Button } from '@/components/terminal/Button';
@@ -9,20 +8,6 @@ import {
   ValidatedInput,
   type ValidatedInputHandle,
 } from '@/components/terminal/ValidatedInput';
-
-// Login mutation - using gql here since codegen might not have run yet
-const LOGIN_MUTATION = gql`
-  mutation Login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      access
-      refresh
-      user {
-        id
-        email
-      }
-    }
-  }
-`;
 
 /**
  * Inner login form — uses useSearchParams and must render inside Suspense (Next.js static generation).
@@ -38,9 +23,6 @@ function LoginPageInner() {
 
   const emailRef = useRef<ValidatedInputHandle>(null);
   const passwordRef = useRef<ValidatedInputHandle>(null);
-
-  const [login] = useMutation(LOGIN_MUTATION);
-  const allowDevAuthFallback = process.env.NODE_ENV !== "production";
 
   const completeLogin = (access: string, refresh: string) => {
     setTokens({ access, refresh });
@@ -58,30 +40,39 @@ function LoginPageInner() {
     if (!emailOk || !passwordOk) return;
 
     setIsSubmitting(true);
-    try {
-      const { data } = await login({
-        variables: {
-          email,
-          password,
-        },
-      });
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-      if (data?.login) {
-        completeLogin(data.login.access, data.login.refresh);
+    try {
+      const fetchFn = typeof fetch !== 'undefined' ? fetch : globalThis.fetch;
+      if (!fetchFn) {
+        setError('AUTHENTICATION_FAILED');
+        setIsSubmitting(false);
         return;
       }
+      const res = await fetchFn(`${backendUrl}/api/token/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: email,
+          password: password,
+        }),
+      });
 
-      if (allowDevAuthFallback) {
-        completeLogin("dev_access_token", "dev_refresh_token");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.access && data.refresh) {
+          completeLogin(data.access, data.refresh);
+          return;
+        }
+      }
+
+      if (res.status === 401) {
+        setError("INVALID_CREDENTIALS");
         return;
       }
 
       setError("AUTHENTICATION_FAILED");
     } catch (err: unknown) {
-      if (allowDevAuthFallback) {
-        completeLogin("dev_access_token", "dev_refresh_token");
-        return;
-      }
       const errorMessage = err instanceof Error ? err.message : 'AUTHENTICATION_FAILED';
       setError(errorMessage.toUpperCase().replace(/\s+/g, '_'));
     } finally {

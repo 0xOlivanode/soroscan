@@ -46,6 +46,10 @@ def _evaluate_query_complexity(body: bytes):
         return JsonResponse({"errors": [{"message": str(exc)}]}, status=400)
 
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
+@method_decorator(csrf_exempt, name="dispatch")
 class ThrottledGraphQLView(GraphQLView):
     """
     GraphQL view with rate limiting and optional introspection blocking.

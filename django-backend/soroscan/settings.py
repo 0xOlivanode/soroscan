@@ -242,6 +242,11 @@ ENDPOINT_RATE_LIMIT_STATS = env("ENDPOINT_RATE_LIMIT_STATS", default="100/minute
 ENDPOINT_RATE_LIMIT_DB_EXPLAIN = env("ENDPOINT_RATE_LIMIT_DB_EXPLAIN", default="10/minute")
 RATE_LIMIT_UNAUTHENTICATED_IP = env("RATE_LIMIT_UNAUTHENTICATED_IP", default="30/minute")
 
+AUTHENTICATION_BACKENDS = [
+    "soroscan.authentication.EmailOrUsernameModelBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 # REST Framework
 REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "soroscan.exceptions.custom_exception_handler",
@@ -340,9 +345,12 @@ CHANNEL_LAYERS = {
     },
 }
 
+# Redis URL
+REDIS_URL = env("REDIS_URL", default="redis://localhost:6379/0")
+
 # Celery
-CELERY_BROKER_URL = env("REDIS_URL", default="redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = env("REDIS_URL", default="redis://localhost:6379/0")
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
@@ -415,6 +423,8 @@ CELERY_BEAT_SCHEDULE = {
     },
     "create-upcoming-event-partitions": {
         "task": "soroscan.ingest.tasks.create_upcoming_event_partitions",
+        "schedule": 604800,  # weekly
+    },
     "detach-expired-event-partitions": {
         "task": "soroscan.ingest.tasks.detach_expired_event_partitions",
         "schedule": 86400,
@@ -550,6 +560,7 @@ LOGGING["handlers"]["slow_queries"] = {
     "when": "midnight",
     "backupCount": 7,
     "formatter": "default",
+    "filters": ["log_context"],
 }
 LOGGING["loggers"]["soroscan.slow_queries"] = {
     "handlers": ["slow_queries", "console"],
@@ -589,6 +600,7 @@ LOGGING["handlers"]["security_audit"] = {
     "when": "midnight",
     "backupCount": 30,
     "formatter": "default",
+    "filters": ["log_context"],
 }
 LOGGING["loggers"]["soroscan.security_audit"] = {
     "handlers": ["security_audit", "console"],

@@ -44,7 +44,7 @@ describe("LanguageSelector", () => {
     render(<LanguageSelector />);
     const select = screen.getByLabelText(/switch language/i);
     fireEvent.change(select, { target: { value: "es" } });
-    expect(window.location.href).toBe("/es/contracts");
+    expect((window.location as any).href).toBe("/es/contracts");
   });
 
   it("strips the locale prefix when switching back to the default locale", () => {
@@ -52,7 +52,7 @@ describe("LanguageSelector", () => {
     render(<LanguageSelector />);
     const select = screen.getByLabelText(/switch language/i);
     fireEvent.change(select, { target: { value: "en" } });
-    expect(window.location.href).toBe("/contracts");
+    expect((window.location as any).href).toBe("/contracts");
   });
 
   it("navigates to the bare /es root when on the default-locale homepage", () => {
@@ -60,6 +60,6 @@ describe("LanguageSelector", () => {
     render(<LanguageSelector />);
     const select = screen.getByLabelText(/switch language/i);
     fireEvent.change(select, { target: { value: "es" } });
-    expect(window.location.href).toBe("/es");
+    expect((window.location as any).href).toBe("/es");
   });
 });

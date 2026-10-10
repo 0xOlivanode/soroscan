@@ -38,7 +38,7 @@ export function PaginationControls({
     <div className={styles.paginationRow}>
       <button
         type="button"
-        className={`${styles.btn} ${styles.secondaryBtn}`}
+        className={`${styles.btn} ${styles.secondaryBtn} cursor-pointer`}
         disabled={currentPage === 1}
         onClick={() => onPageChange(1)}
         title="First page"
@@ -49,7 +49,7 @@ export function PaginationControls({
       
       <button
         type="button"
-        className={`${styles.btn} ${styles.secondaryBtn}`}
+        className={`${styles.btn} ${styles.secondaryBtn} cursor-pointer`}
         disabled={!hasPrev}
         onClick={() => onPageChange(currentPage - 1)}
         title="Previous page"
@@ -66,7 +66,7 @@ export function PaginationControls({
         Showing {startIndex}-{endIndex} of {totalCount}+
       </span>
 
-      <div style={{ width: "140px", marginLeft: "8px" }}>
+      <div style={{ width: "140px", marginLeft: "8px" }} className="cursor-pointer">
         <Dropdown
           options={PAGE_SIZE_OPTIONS}
           value={pageSize.toString()}
@@ -76,7 +76,7 @@ export function PaginationControls({
       
       <button
         type="button"
-        className={`${styles.btn} ${styles.secondaryBtn}`}
+        className={`${styles.btn} ${styles.secondaryBtn} cursor-pointer`}
         disabled={!hasNext}
         onClick={() => onPageChange(currentPage + 1)}
         title="Next page"
@@ -87,7 +87,7 @@ export function PaginationControls({
       
       <button
         type="button"
-        className={`${styles.btn} ${styles.secondaryBtn}`}
+        className={`${styles.btn} ${styles.secondaryBtn} cursor-pointer`}
         disabled={!hasNext}
         onClick={() => {
           // Jump ahead by 10 pages

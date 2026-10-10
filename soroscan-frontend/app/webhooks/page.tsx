@@ -2,8 +2,6 @@
 
 import * as React from "react"
 import { Plus, Activity, CheckCircle2, AlertTriangle } from "lucide-react"
-import { Navbar } from "@/components/terminal/landing/Navbar"
-import { Footer } from "@/components/terminal/landing/Footer"
 import { Button } from "@/components/terminal/Button"
 import { Modal } from "@/components/terminal/Modal"
 import { WebhookTable } from "./components/WebhookTable"
@@ -73,10 +71,8 @@ export default function WebhooksPage() {
   const deleteWebhook = webhooks.find((w) => w.id === deleteTarget)
 
   return (
-    <div className="min-h-screen font-terminal-mono selection:bg-terminal-green selection:text-terminal-black">
-      <Navbar />
-
-      <main className="container mx-auto px-6 md:px-8 py-10 md:py-14 space-y-8 max-w-7xl">
+    <div className="p-6 md:p-8 space-y-8 max-w-7xl font-terminal-mono selection:bg-terminal-green selection:text-terminal-black">
+      <main className="space-y-8">
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -155,11 +151,6 @@ export default function WebhooksPage() {
         </section>
 
       </main>
-
-      {/* Footer */}
-      <div className="container mx-auto px-6 md:px-8 max-w-7xl pb-12">
-        <Footer />
-      </div>
 
       {/* Background deco */}
       <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden opacity-20">

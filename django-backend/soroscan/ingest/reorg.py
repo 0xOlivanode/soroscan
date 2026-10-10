@@ -51,7 +51,8 @@ def _set_indexer_state(key: str, value: str) -> None:
 def fetch_ledger_head(server: SorobanServer) -> LedgerHead:
     """Return the current ledger head from Soroban RPC."""
     response = execute_with_circuit_breaker("horizon", server.get_latest_ledger)
-    return LedgerHead(sequence=int(response.sequence), hash=str(response.hash))
+    ledger_hash = getattr(response, "hash", getattr(response, "id", ""))
+    return LedgerHead(sequence=int(response.sequence), hash=str(ledger_hash))
 
 
 def detect_reorg(head: LedgerHead) -> int | None:

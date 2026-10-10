@@ -45,7 +45,7 @@ from .cache_utils import (
     _SENTINEL,
 )
 from .telemetry import inject_trace_headers, payload_compression_ratio, tracer
-from .reorg import check_and_handle_reorg, is_event_deliverable
+from .reorg import check_and_handle_reorg, fetch_ledger_head, is_event_deliverable
 from .models import (
     BlacklistedContract,
     ContractABI,
@@ -911,7 +911,7 @@ def dispatch_webhook(self, subscription_id: int, event_id: int, replay: bool = F
             "payload": event.payload,
             "ledger": event.ledger,
             "event_index": event.event_index,
-            "tx_hash": event.tx_hash,
+            "tx_hash": getattr(event, "transaction_hash", getattr(event, "tx_hash", "")),
         }
         if replay:
             original_ts = event.timestamp
@@ -2369,17 +2369,23 @@ def ingest_latest_events() -> int:
             logger.info("No active contracts to index", extra={})
             return 0
 
+        if not cursor.isdigit() or int(cursor) <= 0:
+            latest_head = fetch_ledger_head(server)
+            start_ledger = max(1, latest_head.sequence - 100)
+        else:
+            start_ledger = int(cursor)
+
         events_response = execute_with_circuit_breaker(
             "horizon",
             server.get_events,
-            start_ledger=int(cursor) if cursor.isdigit() else None,
+            start_ledger=start_ledger,
             filters=[
                 {
                     "type": "contract",
                     "contractIds": contract_ids,
                 }
             ],
-            pagination={"limit": 100},
+            limit=100,
         )
 
         network = _network_label()
@@ -2417,21 +2423,21 @@ def ingest_latest_events() -> int:
                 continue
 
             # Check whitelist/blacklist filter before persisting
-            if not contract.should_ingest_event(event.type):
+            if not contract.should_ingest_event(getattr(event, "event_type", getattr(event, "type", "contract"))):
                 m.events_filtered_total.labels(
                     contract_id=_short_contract_id(contract.contract_id),
                     network=network,
                     filter_type=contract.event_filter_type,
-                    event_type=event.type,
+                    event_type=getattr(event, "event_type", getattr(event, "type", "contract")),
                 ).inc()
                 logger.debug(
                     "Event type '%s' filtered (%s) for contract %s — skipping",
-                    event.type,
+                    getattr(event, "event_type", getattr(event, "type", "contract")),
                     contract.event_filter_type,
                     contract.contract_id,
                     extra={
                         "contract_id": contract.contract_id,
-                        "event_type": event.type,
+                        "event_type": getattr(event, "event_type", getattr(event, "type", "contract")),
                     },
                 )
                 continue
@@ -2441,7 +2447,7 @@ def ingest_latest_events() -> int:
             if not validate_contract_payload_schema(
                 contract,
                 payload,
-                event.type,
+                getattr(event, "event_type", getattr(event, "type", "contract")),
                 ledger=event.ledger,
             ):
                 m.events_validation_failures_total.labels(
@@ -2451,7 +2457,7 @@ def ingest_latest_events() -> int:
                 continue
 
             passed, version_used = validate_event_payload(
-                contract, event.type, payload, ledger=event.ledger
+                contract, getattr(event, "event_type", getattr(event, "type", "contract")), payload, ledger=event.ledger
             )
             validation_status = "passed" if passed else "failed"
             schema_version = version_used
@@ -2474,10 +2480,10 @@ def ingest_latest_events() -> int:
                 if client is None:
                     client = SorobanClient()
 
-                invocation_data = client.get_invocation(event.tx_hash)
+                invocation_data = client.get_invocation(getattr(event, "transaction_hash", getattr(event, "tx_hash", "")))
                 if invocation_data.success:
                     invocation_record, _ = ContractInvocation.objects.get_or_create(
-                        tx_hash=event.tx_hash,
+                        tx_hash=getattr(event, "transaction_hash", getattr(event, "tx_hash", "")),
                         contract=contract,
                         defaults={
                             "caller": invocation_data.caller,
@@ -2490,14 +2496,14 @@ def ingest_latest_events() -> int:
             except Exception:
                 logger.warning(
                     "Failed to create invocation record for tx=%s",
-                    event.tx_hash,
+                    getattr(event, "transaction_hash", getattr(event, "tx_hash", "")),
                     exc_info=True,
                 )
 
             event_record, created = ContractEvent.objects.get_or_create(
-                tx_hash=event.tx_hash,
+                tx_hash=getattr(event, "transaction_hash", getattr(event, "tx_hash", "")),
                 ledger=event.ledger,
-                event_type=event.type,
+                event_type=getattr(event, "event_type", getattr(event, "type", "contract")),
                 defaults={
                     "contract": contract,
                     "payload": payload,

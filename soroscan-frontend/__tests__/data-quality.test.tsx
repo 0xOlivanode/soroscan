@@ -246,14 +246,14 @@ describe('ManualReconciliationForm', () => {
 
   it('shows error when start date missing', async () => {
     render(<ManualReconciliationForm contractId={CONTRACT} onSubmit={jest.fn()} />);
-    await act(async () => { fireEvent.click(screen.getByTestId('recon-submit-button')); });
+    await act(async () => { fireEvent.submit(screen.getByTestId('manual-reconciliation-form')); });
     expect(screen.getByTestId('recon-error')).toHaveTextContent('Start date is required');
   });
 
   it('shows error when end date missing', async () => {
     render(<ManualReconciliationForm contractId={CONTRACT} onSubmit={jest.fn()} />);
     fireEvent.change(screen.getByTestId('recon-start-date'), { target: { value: '2024-01-01' } });
-    await act(async () => { fireEvent.click(screen.getByTestId('recon-submit-button')); });
+    await act(async () => { fireEvent.submit(screen.getByTestId('manual-reconciliation-form')); });
     expect(screen.getByTestId('recon-error')).toHaveTextContent('End date is required');
   });
 
@@ -262,7 +262,7 @@ describe('ManualReconciliationForm', () => {
     fireEvent.change(screen.getByTestId('recon-start-date'), { target: { value: '2024-03-01' } });
     fireEvent.change(screen.getByTestId('recon-end-date'), { target: { value: '2024-01-01' } });
     fireEvent.change(screen.getByTestId('recon-reason'), { target: { value: 'test' } });
-    await act(async () => { fireEvent.click(screen.getByTestId('recon-submit-button')); });
+    await act(async () => { fireEvent.submit(screen.getByTestId('manual-reconciliation-form')); });
     expect(screen.getByTestId('recon-error')).toHaveTextContent('Start date must be before end date');
   });
 
@@ -270,7 +270,7 @@ describe('ManualReconciliationForm', () => {
     render(<ManualReconciliationForm contractId={CONTRACT} onSubmit={jest.fn()} />);
     fireEvent.change(screen.getByTestId('recon-start-date'), { target: { value: '2024-01-01' } });
     fireEvent.change(screen.getByTestId('recon-end-date'), { target: { value: '2024-01-31' } });
-    await act(async () => { fireEvent.click(screen.getByTestId('recon-submit-button')); });
+    await act(async () => { fireEvent.submit(screen.getByTestId('manual-reconciliation-form')); });
     expect(screen.getByTestId('recon-error')).toHaveTextContent('Reason is required');
   });
 

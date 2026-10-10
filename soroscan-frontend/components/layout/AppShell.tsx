@@ -132,7 +132,7 @@ export function AppShell({ children }: AppShellProps) {
       </a>
 
       {/* Top header */}
-      <header className="sticky top-0 z-30 flex h-[60px] items-center gap-3 border-b border-[#00e5ff]/20 bg-gradient-to-r from-[#091a21] via-[#0e2530] to-[#132b36] px-4">
+      <header className="sticky top-0 z-30 flex h-[60px] items-center gap-3 border-b border-terminal-green/20 bg-terminal-black/95 backdrop-blur-md px-4">
         <HamburgerToggle
           isOpen={sidebarOpen}
           onClick={() => setSidebarOpen((open) => !open)}
@@ -156,21 +156,6 @@ export function AppShell({ children }: AppShellProps) {
 
         <div className="ml-auto flex items-center gap-2">
           <OrganizationSwitcher className="hidden sm:block" />
-
-          {/* Theme Toggle Button */}
-          {mounted && (
-            <button
-              onClick={toggleTheme}
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded p-2 text-terminal-gray hover:text-terminal-green transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terminal-green"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5 text-terminal-warning" aria-hidden="true" />
-              ) : (
-                <Moon className="h-5 w-5 text-terminal-cyan" aria-hidden="true" />
-              )}
-            </button>
-          )}
 
           <nav className="hidden sm:flex items-center gap-1" aria-label="Header navigation">
             {navItems.map((item) => {

@@ -350,7 +350,12 @@ class SorobanClient:
         self.secret_key = secret_key or settings.INDEXER_SECRET_KEY
 
         self.server = SorobanServer(self.rpc_url)
-        self.keypair = Keypair.from_secret(self.secret_key) if self.secret_key else None
+        self.keypair = None
+        if self.secret_key:
+            try:
+                self.keypair = Keypair.from_secret(self.secret_key)
+            except Exception:
+                logger.warning("INDEXER_SECRET_KEY is invalid or a placeholder; keypair signing will be disabled.")
 
         # Invocation tracking infrastructure
         self._rate_limiter = RateLimiter(rate=10)
@@ -882,7 +887,7 @@ class SorobanClient:
                 "contractIds": [contract_id],
             }
         ]
-        pagination = {"limit": 200}
+        limit = 200
 
         try:
             response = execute_with_circuit_breaker(
@@ -891,7 +896,7 @@ class SorobanClient:
                 start_ledger=start_ledger,
                 end_ledger=end_ledger,
                 filters=filters,
-                pagination=pagination,
+                limit=limit,
             )
         except TypeError:
             # Some SDK variants do not support end_ledger.
@@ -900,7 +905,7 @@ class SorobanClient:
                 self.server.get_events,
                 start_ledger=start_ledger,
                 filters=filters,
-                pagination=pagination,
+                limit=limit,
             )
 
         events = list(getattr(response, "events", []) or [])

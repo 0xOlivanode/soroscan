@@ -1,6 +1,36 @@
-from rest_framework import authentication
-from rest_framework import exceptions
+from django.contrib.auth import get_user_model
+from django.contrib.auth.backends import ModelBackend
+from django.db.models import Q
+from rest_framework import authentication, exceptions
 from soroscan.ingest.models import APIKey
+
+
+class EmailOrUsernameModelBackend(ModelBackend):
+    """
+    Allows authentication using either username or email address.
+    """
+
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        user_model = get_user_model()
+        if username is None:
+            username = kwargs.get(user_model.USERNAME_FIELD)
+        if not username or not password:
+            return None
+
+        try:
+            user = user_model.objects.get(
+                Q(username__iexact=username) | Q(email__iexact=username)
+            )
+        except user_model.DoesNotExist:
+            return None
+        except user_model.MultipleObjectsReturned:
+            user = user_model.objects.filter(
+                Q(username__iexact=username) | Q(email__iexact=username)
+            ).first()
+
+        if user and user.check_password(password) and self.user_can_authenticate(user):
+            return user
+        return None
 
 
 class APIKeyAuthentication(authentication.BaseAuthentication):

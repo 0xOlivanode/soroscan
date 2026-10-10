@@ -417,7 +417,7 @@ describe('SyncConfigForm', () => {
 
   it('shows validation error when name is empty', async () => {
     render(<SyncConfigForm onSubmit={jest.fn()} onTestConnection={jest.fn()} />);
-    await act(async () => { fireEvent.click(screen.getByTestId('cfg-submit-button')); });
+    await act(async () => { fireEvent.submit(screen.getByTestId('sync-config-form')); });
     expect(screen.getByTestId('cfg-error')).toHaveTextContent('Name is required');
   });
 

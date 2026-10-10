@@ -182,7 +182,7 @@ describe("EventTable", () => {
         />,
       );
 
-      const viewButtons = screen.getAllByRole("button", { name: /view/i });
+      const viewButtons = screen.getAllByRole("button", { name: /^View details/i });
       fireEvent.click(viewButtons[0]);
 
       expect(mockOnEventClick).toHaveBeenCalledWith(mockEvents[0]);

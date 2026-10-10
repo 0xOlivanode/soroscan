@@ -75,7 +75,7 @@ export function NavDrawer({
               handleLogout();
               onClose();
             }}
-            className="flex items-center gap-2 hover:text-terminal-danger transition-colors min-h-[44px] py-3 px-2 text-left border border-transparent hover:border-terminal-danger/20 rounded-sm font-terminal-mono"
+            className="cursor-pointer flex items-center gap-2 hover:text-terminal-danger transition-colors min-h-[44px] py-3 px-2 text-left border border-transparent hover:border-terminal-danger/20 rounded-sm font-terminal-mono"
           >
             <LogOut size={14} />
             {t("logout")}
