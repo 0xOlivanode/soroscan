@@ -433,6 +433,7 @@ CELERY_BEAT_SCHEDULE = {
     "detach-expired-event-partitions": {
         "task": "soroscan.ingest.tasks.detach_expired_event_partitions",
         "schedule": 86400,
+    },
     # Issue #1289 — emit pg_stat_activity metrics to Prometheus every 60 s
     "emit-db-pool-metrics": {
         "task": "soroscan.ingest.tasks.emit_db_pool_metrics_task",
