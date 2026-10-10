@@ -1,4 +1,19 @@
-export { SoroScanClient, SoroScanError, Paginator, DEFAULT_USER_AGENT } from "./client.js";
+export {
+  SoroScanClient,
+  // Error hierarchy — all classes exported for instanceof checks
+  SoroScanError,
+  SoroScanApiError,
+  SoroScanAuthenticationError,
+  SoroScanAuthorizationError,
+  SoroScanNotFoundError,
+  SoroScanRateLimitError,
+  SoroScanValidationError,
+  SoroScanServerError,
+  SoroScanNetworkError,
+  SoroScanTimeoutError,
+  SoroScanConnectionError,
+  Paginator,
+} from "./client.js";
 export { EventQueryBuilder, ContractQueryBuilder } from "./builder.js";
 export { verifyWebhookSignature } from "./webhookVerification.js";
 export { WebSocketClient } from "./websocket-client.js";
@@ -56,6 +71,8 @@ export type {
   SubscribeWebhookParams,
   UpdateWebhookParams,
   WebhookListResponse,
+  // SC-17: Contract event type info
+  ContractEventTypeInfo,
   // SC-29: Batch event recording
   EventEntry,
   RecordEventsBatchParams,
@@ -73,8 +90,8 @@ export type {
   ErrorCallback,
   ReconnectingCallback,
   EventFilter,
-  // Errors
-  SoroScanApiError,
+  // Errors (raw API response shape)
+  SoroScanApiErrorResponse,
 } from "./types.js";
 
 export * from "./features/sc36";
