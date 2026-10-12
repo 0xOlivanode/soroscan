@@ -132,13 +132,13 @@ jobs:
         run: |
           API_KEY=$(python manage.py shell -c "
           from django.contrib.auth import get_user_model
-          from rest_framework.authtoken.models import Token
+          from soroscan.ingest.models import APIKey
           User = get_user_model()
           u, _ = User.objects.get_or_create(username='sdk-integration-test', is_staff=True, is_superuser=True)
           u.set_password('testpassword123!')
           u.save()
-          t, _ = Token.objects.get_or_create(user=u)
-          print(t.key)
+          ak, _ = APIKey.objects.get_or_create(user=u, name='sdk-test', defaults={'tier': APIKey.Tier.ENTERPRISE})
+          print(ak.key)
           ")
           echo "api_key=${API_KEY}" >> "$GITHUB_OUTPUT"
           echo "::add-mask::${API_KEY}"
@@ -239,13 +239,13 @@ jobs:
           python manage.py migrate --noinput
           API_KEY=$(python manage.py shell -c "
           from django.contrib.auth import get_user_model
-          from rest_framework.authtoken.models import Token
+          from soroscan.ingest.models import APIKey
           User = get_user_model()
           u, _ = User.objects.get_or_create(username='sdk-integration-test', is_staff=True, is_superuser=True)
           u.set_password('testpassword123!')
           u.save()
-          t, _ = Token.objects.get_or_create(user=u)
-          print(t.key)
+          ak, _ = APIKey.objects.get_or_create(user=u, name='sdk-test', defaults={'tier': APIKey.Tier.ENTERPRISE})
+          print(ak.key)
           ")
           echo "INTEGRATION_API_KEY=${API_KEY}" >> "$GITHUB_ENV"
           echo "::add-mask::${API_KEY}"
@@ -338,13 +338,13 @@ jobs:
           python manage.py migrate --noinput
           API_KEY=$(python manage.py shell -c "
           from django.contrib.auth import get_user_model
-          from rest_framework.authtoken.models import Token
+          from soroscan.ingest.models import APIKey
           User = get_user_model()
           u, _ = User.objects.get_or_create(username='sdk-integration-test', is_staff=True, is_superuser=True)
           u.set_password('testpassword123!')
           u.save()
-          t, _ = Token.objects.get_or_create(user=u)
-          print(t.key)
+          ak, _ = APIKey.objects.get_or_create(user=u, name='sdk-test', defaults={'tier': APIKey.Tier.ENTERPRISE})
+          print(ak.key)
           ")
           echo "INTEGRATION_API_KEY=${API_KEY}" >> "$GITHUB_ENV"
           echo "::add-mask::${API_KEY}"

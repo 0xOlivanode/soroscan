@@ -478,7 +478,11 @@ impl SoroScanCore {
             &record,
         );
         env.events().publish(
-            (Symbol::new(&env, TOPIC_SOROSCAN), symbol_short!("sc38"), event_type),
+            (
+                Symbol::new(&env, TOPIC_SOROSCAN),
+                symbol_short!("sc38"),
+                event_type,
+            ),
             record,
         );
 
@@ -1042,7 +1046,11 @@ impl SoroScanCore {
             .set(&DataKey::LatestTaggedByType(event_type.clone()), &record);
 
         env.events().publish(
-            (Symbol::new(&env, TOPIC_SOROSCAN), symbol_short!("sc24"), event_type),
+            (
+                Symbol::new(&env, TOPIC_SOROSCAN),
+                symbol_short!("sc24"),
+                event_type,
+            ),
             record,
         );
 

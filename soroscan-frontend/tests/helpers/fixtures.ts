@@ -257,6 +257,35 @@ export async function installGraphqlMocks(page: Page) {
   await page.route("**/graphql", handler);
   await page.route("**/graphql/", handler);
   await page.route("**/graphql/**", handler);
+
+  await page.route("**/api/token*", async (route) => {
+    if (route.request().method() === "POST") {
+      let body: Record<string, unknown> = {};
+      try {
+        body = route.request().postDataJSON() || {};
+      } catch {
+        body = {};
+      }
+      if (body.password === "short" || body.password === "wrong") {
+        await route.fulfill({
+          status: 401,
+          contentType: "application/json",
+          body: JSON.stringify({ detail: "No active account found with the given credentials" }),
+        });
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          access: "e2e-access-token",
+          refresh: "e2e-refresh-token",
+        }),
+      });
+      return;
+    }
+    await route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
+  });
 }
 
 export async function seedAuth(page: Page) {

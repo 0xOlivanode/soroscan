@@ -124,7 +124,7 @@ export default function WebhookTestingConsolePage() {
   return (
     <div className="min-h-screen font-terminal-mono selection:bg-terminal-green selection:text-terminal-black">
       <Navbar />
-      <main className="container mx-auto px-6 md:px-8 py-10 md:py-14 space-y-6 max-w-6xl">
+      <div className="container mx-auto px-6 md:px-8 py-10 md:py-14 space-y-6 max-w-6xl">
         <header>
           <div className="text-[10px] text-terminal-cyan tracking-widest mb-2">[WEBHOOK_TEST_CONSOLE]</div>
           <h1 className="text-3xl md:text-4xl font-bold text-terminal-green">Test Webhook Deliveries</h1>
@@ -133,9 +133,10 @@ export default function WebhookTestingConsolePage() {
 
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4 border border-terminal-green/20 p-4">
-            <label className="block text-xs text-terminal-gray tracking-widest">WEBHOOK_URL</label>
+            <label htmlFor="webhook-url-select" className="block text-xs text-terminal-gray tracking-widest">WEBHOOK_URL</label>
             <select
-              aria-label="Webhook selector"
+              id="webhook-url-select"
+              aria-label="WEBHOOK_URL"
               className="w-full border border-terminal-green/30 bg-terminal-black px-3 py-2 text-sm"
               value={selectedUrl}
               onChange={(event) => setSelectedUrl(event.target.value)}
@@ -145,9 +146,10 @@ export default function WebhookTestingConsolePage() {
               ))}
             </select>
 
-            <label className="block text-xs text-terminal-gray tracking-widest">PAYLOAD_EDITOR</label>
+            <label htmlFor="payload-editor-textarea" className="block text-xs text-terminal-gray tracking-widest">PAYLOAD_EDITOR</label>
             <textarea
-              aria-label="Webhook payload JSON"
+              id="payload-editor-textarea"
+              aria-label="PAYLOAD_EDITOR"
               spellCheck={false}
               value={payloadText}
               onChange={(event) => setPayloadText(event.target.value)}
@@ -212,7 +214,7 @@ export default function WebhookTestingConsolePage() {
             </ul>
           )}
         </section>
-      </main>
+      </div>
 
       <div className="container mx-auto px-6 md:px-8 max-w-6xl pb-12">
         <Footer />

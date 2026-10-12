@@ -141,7 +141,7 @@ class CacheStatsEndpointTest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = UserFactory()
+        self.user = UserFactory(is_staff=True)
         self.client.force_authenticate(user=self.user)
 
     def test_cache_stats_returns_ok(self):
@@ -155,6 +155,12 @@ class CacheStatsEndpointTest(TestCase):
         self.client.force_authenticate(user=None)
         response = self.client.get("/api/cache/stats/")
         self.assertIn(response.status_code, [401, 403])
+
+    def test_cache_stats_non_staff_forbidden(self):
+        non_staff = UserFactory(is_staff=False)
+        self.client.force_authenticate(user=non_staff)
+        response = self.client.get("/api/cache/stats/")
+        self.assertEqual(response.status_code, 403)
 
 
 @override_settings(CACHES={

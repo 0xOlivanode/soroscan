@@ -3137,11 +3137,16 @@ def cache_stats_view(request):
     except Exception:
         logger.debug("Could not collect Prometheus cache counters for stats view.")
 
+    is_redis_backend = "redis" in backend_class.lower() or "redis" in backend_info.lower()
+    cache_status = ("ok" if redis_info else "degraded") if is_redis_backend else "ok"
+    default_ttl = getattr(settings, "QUERY_CACHE_TTL_SECONDS", 60)
+
     return Response({
         "backend": backend_info,
-        "query_cache_ttl": getattr(settings, "QUERY_CACHE_TTL_SECONDS", 60),
+        "default_ttl": default_ttl,
+        "query_cache_ttl": default_ttl,
         "contracts_list_cache_ttl": contracts_list_cache_ttl(),
-        "status": "ok" if redis_info else "degraded",
+        "status": cache_status,
         "redis": redis_info,
         "prometheus": prom_stats,
     })

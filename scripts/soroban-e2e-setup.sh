@@ -35,16 +35,30 @@ fi
 ADDR="$(stellar keys address "${IDENTITY}")"
 
 echo "[soroban-e2e] Funding ${ADDR} via friendbot"
+FUNDED=false
 for _ in $(seq 1 30); do
-  if stellar keys fund "${IDENTITY}" --network "${NETWORK_NAME}" >/dev/null 2>&1; then
+  if curl -sf "${HORIZON}/accounts/${ADDR}" >/dev/null 2>&1; then
+    FUNDED=true
+    echo "[soroban-e2e] Account ${ADDR} is funded"
     break
   fi
-  if curl -sf "${HORIZON}/friendbot?addr=${ADDR}" >/dev/null 2>&1; then
-    break
-  fi
-  sleep 2
+  curl -sf "${HORIZON}/friendbot?addr=${ADDR}" >/dev/null 2>&1 || \
+    stellar keys fund "${IDENTITY}" --network "${NETWORK_NAME}" >/dev/null 2>&1 || true
+  sleep 3
 done
-if ! curl -sf "${HORIZON}/accounts/${ADDR}" >/dev/null 2>&1; then
+
+if [ "$FUNDED" = false ]; then
+  for _ in $(seq 1 15); do
+    if curl -sf "${HORIZON}/accounts/${ADDR}" >/dev/null 2>&1; then
+      FUNDED=true
+      echo "[soroban-e2e] Account ${ADDR} is funded"
+      break
+    fi
+    sleep 2
+  done
+fi
+
+if [ "$FUNDED" = false ]; then
   echo "[soroban-e2e] ERROR: account ${ADDR} was not funded"
   exit 1
 fi
