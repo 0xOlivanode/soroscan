@@ -276,13 +276,13 @@ class TestWebhookDeliveryLogTransitions:
 
     def test_ordering_by_timestamp(self, webhook_subscription, contract_event):
         """Test logs are ordered by timestamp descending."""
-        log1 = WebhookDeliveryLog.objects.create(
+        WebhookDeliveryLog.objects.create(
             subscription=webhook_subscription,
             event=contract_event,
             attempt_number=1,
             status=WebhookDeliveryLog.STATUS_PENDING,
         )
-        log2 = WebhookDeliveryLog.objects.create(
+        WebhookDeliveryLog.objects.create(
             subscription=webhook_subscription,
             event=contract_event,
             attempt_number=2,

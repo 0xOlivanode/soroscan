@@ -122,7 +122,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/soroscan_integration
           REDIS_URL: redis://localhost:6379/0
-          SECRET_KEY: integration-test-secret-key
+          SECRET_KEY: integration-test-secret-key-at-least-50-characters-long-for-ci-security-check
           DJANGO_SETTINGS_MODULE: soroscan.settings
           SOROBAN_RPC_URL: https://soroban-testnet.stellar.org
           STELLAR_NETWORK_PASSPHRASE: "Test SDF Network ; September 2015"
@@ -130,7 +130,7 @@ jobs:
           CELERY_TASK_ALWAYS_EAGER: "True"
           SENTRY_DSN: ""
         run: |
-          API_KEY=$(python manage.py shell -c "
+          RAW_OUTPUT=$(python manage.py shell -c "
           from django.contrib.auth import get_user_model
           from soroscan.ingest.models import APIKey
           User = get_user_model()
@@ -138,8 +138,9 @@ jobs:
           u.set_password('testpassword123!')
           u.save()
           ak, _ = APIKey.objects.get_or_create(user=u, name='sdk-test', defaults={'tier': APIKey.Tier.ENTERPRISE})
-          print(ak.key)
+          print('API_KEY_TOKEN=' + ak.key)
           ")
+          API_KEY=$(echo "$RAW_OUTPUT" | grep 'API_KEY_TOKEN=' | cut -d= -f2)
           echo "api_key=${API_KEY}" >> "$GITHUB_OUTPUT"
           echo "::add-mask::${API_KEY}"
 
@@ -225,7 +226,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/soroscan_integration
           REDIS_URL: redis://localhost:6379/0
-          SECRET_KEY: integration-test-secret-key
+          SECRET_KEY: integration-test-secret-key-at-least-50-characters-long-for-ci-security-check
           DEBUG: "True"
           DJANGO_SETTINGS_MODULE: soroscan.settings
           SOROBAN_RPC_URL: https://soroban-testnet.stellar.org
@@ -237,7 +238,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python manage.py migrate --noinput
-          API_KEY=$(python manage.py shell -c "
+          RAW_OUTPUT=$(python manage.py shell -c "
           from django.contrib.auth import get_user_model
           from soroscan.ingest.models import APIKey
           User = get_user_model()
@@ -245,8 +246,9 @@ jobs:
           u.set_password('testpassword123!')
           u.save()
           ak, _ = APIKey.objects.get_or_create(user=u, name='sdk-test', defaults={'tier': APIKey.Tier.ENTERPRISE})
-          print(ak.key)
+          print('API_KEY_TOKEN=' + ak.key)
           ")
+          API_KEY=$(echo "$RAW_OUTPUT" | grep 'API_KEY_TOKEN=' | cut -d= -f2)
           echo "INTEGRATION_API_KEY=${API_KEY}" >> "$GITHUB_ENV"
           echo "::add-mask::${API_KEY}"
           python manage.py runserver 0.0.0.0:8000 &
@@ -324,7 +326,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/soroscan_integration
           REDIS_URL: redis://localhost:6379/0
-          SECRET_KEY: integration-test-secret-key
+          SECRET_KEY: integration-test-secret-key-at-least-50-characters-long-for-ci-security-check
           DEBUG: "True"
           DJANGO_SETTINGS_MODULE: soroscan.settings
           SOROBAN_RPC_URL: https://soroban-testnet.stellar.org
@@ -336,7 +338,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python manage.py migrate --noinput
-          API_KEY=$(python manage.py shell -c "
+          RAW_OUTPUT=$(python manage.py shell -c "
           from django.contrib.auth import get_user_model
           from soroscan.ingest.models import APIKey
           User = get_user_model()
@@ -344,8 +346,9 @@ jobs:
           u.set_password('testpassword123!')
           u.save()
           ak, _ = APIKey.objects.get_or_create(user=u, name='sdk-test', defaults={'tier': APIKey.Tier.ENTERPRISE})
-          print(ak.key)
+          print('API_KEY_TOKEN=' + ak.key)
           ")
+          API_KEY=$(echo "$RAW_OUTPUT" | grep 'API_KEY_TOKEN=' | cut -d= -f2)
           echo "INTEGRATION_API_KEY=${API_KEY}" >> "$GITHUB_ENV"
           echo "::add-mask::${API_KEY}"
           python manage.py runserver 0.0.0.0:8000 &

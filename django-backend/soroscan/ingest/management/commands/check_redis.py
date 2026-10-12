@@ -26,7 +26,7 @@ class Command(BaseCommand):
         # 1. Ping -----------------------------------------------------------
         try:
             start = time.monotonic()
-            result = cache.get(self._TEST_KEY)  # any cache op triggers connect
+            cache.get(self._TEST_KEY)  # any cache op triggers connect
             # Use the lower-level client for an explicit PING when available.
             client = getattr(cache, "_cache", None) or getattr(cache, "client", None)
             if hasattr(client, "ping"):

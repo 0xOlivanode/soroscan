@@ -218,7 +218,7 @@ def emit_pool_metrics() -> None:
 
         # Update Prometheus gauges if they exist.
         try:
-            from prometheus_client import Gauge, REGISTRY  # noqa: PLC0415
+            from prometheus_client import Gauge  # noqa: PLC0415
             from soroscan.ingest.metrics import _get_or_create  # noqa: PLC0415
 
             pg_total = _get_or_create(

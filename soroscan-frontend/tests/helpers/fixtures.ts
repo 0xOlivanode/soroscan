@@ -70,6 +70,11 @@ function operationName(query: string): string {
 async function fulfillJson(route: Route, data: unknown, status = 200) {
   await route.fulfill({
     status,
+    headers: {
+      "access-control-allow-origin": "*",
+      "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "access-control-allow-headers": "*",
+    },
     contentType: "application/json",
     body: JSON.stringify({ data }),
   });
@@ -84,7 +89,14 @@ export async function installGraphqlMocks(page: Page) {
 
   const handler = async (route: Route) => {
     if (route.request().method() === "OPTIONS") {
-      await route.fulfill({ status: 204 });
+      await route.fulfill({
+        status: 204,
+        headers: {
+          "access-control-allow-origin": "*",
+          "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-headers": "*",
+        },
+      });
       return;
     }
 
@@ -258,7 +270,21 @@ export async function installGraphqlMocks(page: Page) {
   await page.route("**/graphql/", handler);
   await page.route("**/graphql/**", handler);
 
+  const corsHeaders = {
+    "access-control-allow-origin": "*",
+    "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "access-control-allow-headers": "*",
+  };
+
   await page.route("**/api/token*", async (route) => {
+    if (route.request().method() === "OPTIONS") {
+      await route.fulfill({
+        status: 204,
+        headers: corsHeaders,
+      });
+      return;
+    }
+
     if (route.request().method() === "POST") {
       let body: Record<string, unknown> = {};
       try {
@@ -269,6 +295,7 @@ export async function installGraphqlMocks(page: Page) {
       if (body.password === "short" || body.password === "wrong") {
         await route.fulfill({
           status: 401,
+          headers: corsHeaders,
           contentType: "application/json",
           body: JSON.stringify({ detail: "No active account found with the given credentials" }),
         });
@@ -276,6 +303,7 @@ export async function installGraphqlMocks(page: Page) {
       }
       await route.fulfill({
         status: 200,
+        headers: corsHeaders,
         contentType: "application/json",
         body: JSON.stringify({
           access: "e2e-access-token",
@@ -284,7 +312,12 @@ export async function installGraphqlMocks(page: Page) {
       });
       return;
     }
-    await route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
+    await route.fulfill({
+      status: 200,
+      headers: corsHeaders,
+      contentType: "application/json",
+      body: "{}",
+    });
   });
 }
 

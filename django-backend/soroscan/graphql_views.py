@@ -20,6 +20,8 @@ import logging
 from django.conf import settings
 from django.core.cache import cache
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from graphql.error import GraphQLError
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from strawberry.django.views import GraphQLView
@@ -72,8 +74,6 @@ def _evaluate_query_complexity(body: bytes):
         return JsonResponse({"errors": [{"message": str(exc)}]}, status=400)
 
 
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 
 
 def _graphql_cache_key(query: str, variables: dict, user_id: object) -> str:

@@ -223,7 +223,7 @@ const ValidatedInput = React.forwardRef<
           id={hintId}
           data-slot="validated-input-hint"
           className={cn(
-            "text-[10px] text-terminal-gray/70 ml-1 font-terminal-mono",
+            "text-[10px] text-terminal-gray ml-1 font-terminal-mono",
             hintClassName
           )}
         >
