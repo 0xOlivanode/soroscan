@@ -200,7 +200,17 @@ def db_pool_stats_view(request):
         "statement_timeout_ms": DB_POOL_SETTINGS.get("_statement_timeout_ms"),
     }
 
-    return Response({"live": live_stats, "config": config})
+    if request.query_params.get("details") == "true" or request.query_params.get("include_config") == "true":
+        return Response({"live": live_stats, "config": config})
+
+    return Response(
+        {
+            "total": live_stats["total"],
+            "active": live_stats["active"],
+            "idle": live_stats["idle"],
+            "wait_queue": live_stats["wait_queue"],
+        }
+    )
 
 
 @extend_schema(

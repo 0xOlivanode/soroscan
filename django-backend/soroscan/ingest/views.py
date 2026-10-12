@@ -856,16 +856,10 @@ class ContractEventViewSet(viewsets.ReadOnlyModelViewSet):
         # Maximum page size enforced at 100 (issue #1433).
         try:
             page = int(request.GET.get("page", 1))
+            if page <= 0:
+                page = 1
         except (ValueError, TypeError):
-            return Response(
-                {"detail": "page must be a valid integer greater than 0."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if page <= 0:
-            return Response(
-                {"detail": "page must be greater than 0."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            page = 1
         try:
             page_size = int(request.GET.get("page_size", 50))
         except (ValueError, TypeError):

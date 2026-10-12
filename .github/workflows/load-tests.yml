@@ -28,6 +28,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install test dependencies
+        run: pip install pytest
+
       - name: Validate k6 scripts
         run: python -m pytest -q load-tests/tests
 

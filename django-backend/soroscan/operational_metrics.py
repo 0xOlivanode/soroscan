@@ -59,7 +59,8 @@ class OperationalHealthCollector:
                 else _collect_fallback_pool_stats(wrapper)
             )
             for state, value in stats.items():
-                connection_metric.add_metric([state], value)
+                numeric_val = float(value) if value is not None else 0.0
+                connection_metric.add_metric([state], numeric_val)
         except Exception:
             logger.exception("Unable to collect database pool metrics")
         yield connection_metric

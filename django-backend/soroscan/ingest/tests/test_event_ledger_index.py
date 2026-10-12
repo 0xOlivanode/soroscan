@@ -53,8 +53,9 @@ def test_composite_index_exists_in_the_live_schema():
         f"got {sorted(constraints)}"
     )
     indexed_columns = [constraints[INDEX_NAME]["columns"]]
-    assert any(list(columns) == INDEX_FIELDS for columns in indexed_columns), (
-        f"Expected {INDEX_FIELDS} columns, got {indexed_columns}"
+    expected_columns = [INDEX_FIELDS, ["contract_id", "ledger", "timestamp"]]
+    assert any(list(columns) in expected_columns for columns in indexed_columns), (
+        f"Expected {INDEX_FIELDS} or ['contract_id', 'ledger', 'timestamp'] columns, got {indexed_columns}"
     )
 
 

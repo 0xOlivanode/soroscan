@@ -227,7 +227,7 @@ export const TooltipUtils = {
    * Get appropriate tooltip for contract health status
    */
   getHealthStatusTooltip: (
-    status: 'healthy' | 'degraded' | 'paused' | 'error',
+    status: 'healthy' | 'degraded' | 'paused' | 'error' | 'offline',
     context?: Partial<DegradationContext>
   ): string => {
     switch (status) {
@@ -239,6 +239,9 @@ export const TooltipUtils = {
       
       case 'error':
         return 'Contract has encountered critical errors and is non-functional';
+
+      case 'offline':
+        return 'Contract is currently offline or unreachable';
       
       case 'degraded':
         if (context) {

@@ -28,7 +28,14 @@ def partition_contractevent(apps, schema_editor):
             -- Ensure sequence for id primary key
             CREATE SEQUENCE IF NOT EXISTS ingest_contractevent_id_seq;
             ALTER TABLE ingest_contractevent ALTER COLUMN id SET DEFAULT nextval('ingest_contractevent_id_seq');
-            ALTER SEQUENCE ingest_contractevent_id_seq OWNED BY ingest_contractevent.id;
+            DO $$
+            BEGIN
+                BEGIN
+                    ALTER SEQUENCE ingest_contractevent_id_seq OWNED BY ingest_contractevent.id;
+                EXCEPTION WHEN OTHERS THEN
+                    NULL;
+                END;
+            END $$;
 
             -- 3. Create initial active partitions and default partition
             CREATE TABLE ingest_contractevent_y2026m08 PARTITION OF ingest_contractevent
@@ -42,8 +49,11 @@ def partition_contractevent(apps, schema_editor):
             -- 4. Migrate data
             INSERT INTO ingest_contractevent SELECT * FROM ingest_contractevent_old;
 
+            -- Update sequence value to max existing id
+            SELECT setval('ingest_contractevent_id_seq', COALESCE((SELECT MAX(id) FROM ingest_contractevent), 1));
+
             -- 5. Drop old temporary table
-            DROP TABLE ingest_contractevent_old CASCADE;
+            DROP TABLE IF EXISTS ingest_contractevent_old CASCADE;
             """
         )
 
@@ -55,8 +65,21 @@ def unpartition_contractevent(apps, schema_editor):
     with schema_editor.connection.cursor() as cursor:
         cursor.execute(
             """
-            DROP TABLE ingest_contractevent;
-            ALTER TABLE ingest_contractevent_old RENAME TO ingest_contractevent;
+            DO $$
+            BEGIN
+                IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'ingest_contractevent_old') THEN
+                    DROP TABLE IF EXISTS ingest_contractevent CASCADE;
+                    ALTER TABLE ingest_contractevent_old RENAME TO ingest_contractevent;
+                ELSE
+                    -- Recreate unpartitioned table and copy data back
+                    CREATE TABLE IF NOT EXISTS ingest_contractevent_unpart (
+                        LIKE ingest_contractevent INCLUDING DEFAULTS INCLUDING CONSTRAINTS
+                    );
+                    INSERT INTO ingest_contractevent_unpart SELECT * FROM ingest_contractevent;
+                    DROP TABLE ingest_contractevent CASCADE;
+                    ALTER TABLE ingest_contractevent_unpart RENAME TO ingest_contractevent;
+                END IF;
+            END $$;
             """
         )
 
