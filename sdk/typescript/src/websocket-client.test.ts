@@ -46,7 +46,7 @@ class MockWebSocket {
     this.dispatchEvent("close", null);
   }
 
-  private dispatchEvent(event: string, data: any) {
+  protected dispatchEvent(event: string, data: any) {
     if (this.listeners[event]) {
       this.listeners[event].forEach((callback) => {
         callback(data instanceof Event ? data : { data });
@@ -335,7 +335,7 @@ describe("WebSocketClient", () => {
       const sendSpy = vi.fn();
 
       global.WebSocket = class extends MockWebSocket {
-        send(data: string) {
+        override send(data: string) {
           sendSpy(data);
         }
       } as any;
@@ -363,7 +363,7 @@ describe("WebSocketClient", () => {
       const sendSpy = vi.fn();
 
       global.WebSocket = class extends MockWebSocket {
-        send(data: string) {
+        override send(data: string) {
           sendSpy(data);
         }
       } as any;
