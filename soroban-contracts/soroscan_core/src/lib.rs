@@ -1060,6 +1060,9 @@ impl SoroScanCore {
             record,
         );
 
+        // Increment recorded-event count for indexer (SC-13)
+        Self::bump_indexer_count(&env, &indexer, 1);
+
         Ok(count)
     }
 
