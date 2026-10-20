@@ -41,6 +41,7 @@ def _event_to_sdk(event: ContractEvent) -> dict:
 
 
 def _contract_to_sdk(contract: TrackedContract) -> dict:
+    verification = ContractVerification.objects.filter(contract=contract).first()
     return {
         "id": contract.contract_id,
         "network": contract.network,
@@ -52,8 +53,11 @@ def _contract_to_sdk(contract: TrackedContract) -> dict:
         "lastActivityAt": _isoformat(contract.last_event_at),
         "totalEvents": contract.events.count(),
         "spec": None,
-        "verified": False,
-        "verifiedAt": None,
+        "verified": (
+            verification is not None
+            and verification.status == ContractVerification.Status.VERIFIED
+        ),
+        "verifiedAt": _isoformat(verification.verified_at) if verification else None,
         "sourceCode": None,
         "label": contract.name,
     }
