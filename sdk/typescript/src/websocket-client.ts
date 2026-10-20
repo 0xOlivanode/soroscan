@@ -379,7 +379,7 @@ export class WebSocketClient {
       try {
         await this.connect();
         this.reconnectedCallbacks.forEach((cb) => cb());
-      } catch (error) {
+      } catch (error: unknown) {
         // Error handled in connect() - continue scheduling reconnects
         this.handleConnectionClose();
       }
